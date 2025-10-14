@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.1"
+agp = "8.12.3"
 bcpkixJdk15on = "1.70"
 coilCompose = "2.7.0"
 composeNavigation = "1.4.1"
