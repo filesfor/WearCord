@@ -73,7 +73,7 @@ public class DiscordQrAuthClient {
 
         generateKeys();
 
-        pws = new PacketWebsocket(WEBSOCKET_URI, Map.of("Origin", "https://discord.com"), this::handlePacket, integer -> {
+        pws = new PacketWebsocket(WEBSOCKET_URI, Map.of("Origin", "https://discord.com", "User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0"), this::handlePacket, integer -> {
             if (integer == 4003) {
                 this.tokenFuture.completeExceptionally(new TimedOutException());
                 try {
@@ -200,6 +200,7 @@ public class DiscordQrAuthClient {
                 try {
                     String ticket = packet.data.get("ticket").getAsString();
                     String token = decryptAndExchangeToken(ticket);
+                    System.out.println("Decrypted token: "+token);
                     this.tokenFuture.complete(token);
                     close();
                 } catch (Throwable e) {
@@ -234,14 +235,17 @@ public class DiscordQrAuthClient {
                 .build();
 
         try (Response response = client.newCall(request).execute()) { // Use try-with-resources for Response
-            if (response.body() != null) System.out.println(response.body().string());
+            //if (response.body() != null) System.out.println("response not null" + response.body().string());
             if (!response.isSuccessful() || response.body() == null) { // Check for successful response and non-null body
                 throw new IOException("Unexpected code " + response);
             }
             String responseBody = response.body().string();
+            System.out.println("response body is: " + responseBody);
             Structs.EncryptedTokenResponse encryptedTokenResponse = gson.fromJson(responseBody, Structs.EncryptedTokenResponse.class);
             byte[] bytes = decryptUsingKey(Base64.getDecoder().decode(encryptedTokenResponse.encryptedToken));
-            return new String(bytes);
+            String tkn = new String(bytes);
+            System.out.println("decrypted token is: " + tkn);
+            return tkn;
         }
     }
 
