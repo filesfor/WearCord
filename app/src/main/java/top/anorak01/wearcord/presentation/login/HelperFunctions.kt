@@ -155,7 +155,7 @@ fun generateQrCodeBitmap(text: String, width: Int = 512, height: Int = 512): Bit
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
         for (x in 0 until width) {
             for (y in 0 until height) {
-                bitmap.setPixel(x, y, if (bitMatrix[x, y]) 0 else 255)
+                bitmap.setPixel(x, y, if (bitMatrix[x, y]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt())
             }
         }
         bitmap
